@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
+  onFocus?: () => void;
 }
 
 const quickCategories = [
@@ -32,7 +33,7 @@ const quickCategories = [
   },
 ];
 
-export function ChatInput({ onSend }: ChatInputProps) {
+export function ChatInput({ onSend, onFocus }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<
     (typeof quickCategories)[0] | null
@@ -122,6 +123,7 @@ export function ChatInput({ onSend }: ChatInputProps) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
+          onFocus={onFocus}
           enterKeyHint="send"
           placeholder="Type a message..."
           className="flex-1 px-4 py-2 bg-muted rounded-full text-base outline-none focus:ring-2 focus:ring-blue-500"

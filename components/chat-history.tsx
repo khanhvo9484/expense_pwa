@@ -21,18 +21,17 @@ export function ChatHistory({
   const [selectedDate, setSelectedDate] = useState<Date>(new Date(currentDate));
 
   useEffect(() => {
+    const loadChatDates = async () => {
+      try {
+        const dates = await db.getAllChatDates();
+        const dateObjects = dates.map((d) => new Date(d));
+        setChatDates(dateObjects);
+      } catch (error) {
+        console.error("Failed to load chat dates:", error);
+      }
+    };
     loadChatDates();
   }, []);
-
-  const loadChatDates = async () => {
-    try {
-      const dates = await db.getAllChatDates();
-      const dateObjects = dates.map((d) => new Date(d));
-      setChatDates(dateObjects);
-    } catch (error) {
-      console.error("Failed to load chat dates:", error);
-    }
-  };
 
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
@@ -51,7 +50,6 @@ export function ChatHistory({
     try {
       const dateStr = date.toISOString().split("T")[0];
       await db.deleteChatMessagesByDate(dateStr);
-      await loadChatDates();
 
       // If deleted current date, switch to today
       if (dateStr === currentDate) {

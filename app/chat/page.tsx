@@ -8,8 +8,9 @@ import { ChatHistory } from "@/components/chat-history";
 import { Card } from "@/components/ui/card";
 import { ExpenseExtractor } from "@/lib/expense-extractor";
 import { db } from "@/lib/db";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Calendar } from "lucide-react";
+import dayjs from "dayjs";
 
 interface Message {
   id: string;
@@ -21,7 +22,8 @@ interface Message {
 
 export default function ChatPage() {
   const [currentDate, setCurrentDate] = useState<string>(
-    new Date().toISOString().split("T")[0]
+    // Use dayjs
+    dayjs().format("YYYY-MM-DD")
   );
   const [showHistory, setShowHistory] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -31,6 +33,16 @@ export default function ChatPage() {
     date: string;
     categoryId?: string;
   } | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = (smooth = true) => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: smooth ? "smooth" : "auto",
+      });
+    }
+  };
 
   // Initialize database on mount
   useEffect(() => {
@@ -39,11 +51,18 @@ export default function ChatPage() {
     });
   }, []);
 
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   // Load chat messages for current date
   useEffect(() => {
     const loadChatMessages = async () => {
       try {
+        console.log("Loading messages for date:", currentDate);
         const chatMessages = await db.getChatMessagesByDate(currentDate);
+        console.log("Loaded messages:", chatMessages);
         if (chatMessages.length === 0) {
           // Show welcome message for new day
           setMessages([
@@ -250,7 +269,9 @@ export default function ChatPage() {
     <div className="flex flex-col h-screen max-w-md mx-auto bg-gray-50 dark:bg-black">
       {/* Header */}
       <Card className="flex items-center justify-between px-4 py-3 rounded-none rounded-b-xl border-x-0 border-t-0 shadow-sm gap-0">
-        <h1 className="text-lg font-semibold">Chat</h1>
+        <div>
+          <h1 className="text-lg font-semibold">Chat</h1>
+        </div>
         <div className="items-center gap-2 hidden">
           <button
             onClick={() => setShowHistory(true)}
@@ -263,7 +284,62 @@ export default function ChatPage() {
       </Card>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 pb-[200px]">
+      <div
+        ref={chatContainerRef}
+        className="flex-1 overflow-y-auto px-4 py-4 pb-[200px]"
+      >
+        <div className="text-sm text-center mb-2 text-gray-500 flex gap-2 justify-center items-center">
+          <button
+            onClick={() =>
+              setCurrentDate(
+                dayjs(currentDate).subtract(1, "day").format("YYYY-MM-DD")
+              )
+            }
+            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+            title="Previous day"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <div>{currentDate}</div>
+          <Calendar className="w-5 h-5" />
+
+          <button
+            onClick={() =>
+              setCurrentDate(
+                dayjs(currentDate).add(1, "day").format("YYYY-MM-DD")
+              )
+            }
+            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+            title="Next day"
+            disabled={currentDate === dayjs().format("YYYY-MM-DD")}
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </div>
         {messages.map((message) => (
           <ChatMessage
             key={message.id}
@@ -290,7 +366,7 @@ export default function ChatPage() {
 
       {/* Chat Input - Fixed above footer */}
       <div className="fixed bottom-[76px] left-0 right-0 max-w-md mx-auto bg-transparent">
-        <ChatInput onSend={handleSendMessage} />
+        <ChatInput onSend={handleSendMessage} onFocus={scrollToBottom} />
       </div>
 
       {/* Footer Menu */}
@@ -301,7 +377,8 @@ export default function ChatPage() {
         <ChatHistory
           currentDate={currentDate}
           onDateSelect={(date) => {
-            setCurrentDate(date);
+            console.log(date, "date");
+            setCurrentDate(dayjs(date).add(1, "day").format("YYYY-MM-DD"));
             setShowHistory(false);
           }}
           onClose={() => setShowHistory(false)}

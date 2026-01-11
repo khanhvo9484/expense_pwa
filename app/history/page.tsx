@@ -3,7 +3,6 @@
 import { FooterMenu } from "@/components/footer-menu";
 import { Card } from "@/components/ui/card";
 import {
-  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
@@ -30,7 +29,6 @@ import { useState, useEffect } from "react";
 import {
   format,
   startOfMonth,
-  endOfMonth,
   subMonths,
   addMonths,
   isSameMonth,
@@ -39,8 +37,6 @@ import {
   getDate,
   lastDayOfMonth,
   parseISO,
-  isAfter,
-  isBefore,
 } from "date-fns";
 import {
   ChevronLeft,
@@ -51,6 +47,7 @@ import {
   TrendingDown,
   Filter,
   ArrowUpDown,
+  Pencil,
 } from "lucide-react";
 import { Empty } from "@/components/ui/empty";
 import {
@@ -61,6 +58,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { ExpenseEditDialog } from "@/components/expense-edit-dialog";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -73,6 +71,8 @@ export default function StatsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"date" | "amount">("date");
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const getCategoryDetails = (categoryId: string) => {
     const category = categoriesData.categories.find(
@@ -89,6 +89,7 @@ export default function StatsPage() {
 
   useEffect(() => {
     loadExpenses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMonth]);
 
   useEffect(() => {
@@ -197,6 +198,32 @@ export default function StatsPage() {
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
+    }
+  };
+
+  const handleEditExpense = (expense: Expense) => {
+    setEditingExpense(expense);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSaveExpense = async (
+    expenseId: string,
+    updates: { categoryId: string; categoryName: string; date: string }
+  ) => {
+    try {
+      await db.updateExpense(expenseId, updates);
+      await loadExpenses();
+    } catch (error) {
+      console.error("Failed to update expense:", error);
+    }
+  };
+
+  const handleDeleteExpense = async (expenseId: string) => {
+    try {
+      await db.deleteExpense(expenseId);
+      await loadExpenses();
+    } catch (error) {
+      console.error("Failed to delete expense:", error);
     }
   };
 
@@ -444,6 +471,18 @@ export default function StatsPage() {
                             Created: {formatDateTime(expense.createdAt)}
                           </p>
                         </div>
+
+                        <div className="pt-2">
+                          <Button
+                            onClick={() => handleEditExpense(expense)}
+                            variant="outline"
+                            size="sm"
+                            className="w-full gap-2"
+                          >
+                            <Pencil className="w-4 h-4" />
+                            Edit Expense
+                          </Button>
+                        </div>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -501,6 +540,15 @@ export default function StatsPage() {
 
       {/* Footer Menu */}
       <FooterMenu />
+
+      {/* Edit Dialog */}
+      <ExpenseEditDialog
+        expense={editingExpense}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onSave={handleSaveExpense}
+        onDelete={handleDeleteExpense}
+      />
     </div>
   );
 }

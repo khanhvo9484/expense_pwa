@@ -17,7 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Save, Key, Brain } from "lucide-react";
+import { Save, Key, Brain, Eye, EyeOff, Copy, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const availableModels = [
   { id: "llama-3.3-70b-versatile", name: "Llama 3.3 70B Versatile" },
@@ -30,6 +31,8 @@ export function Settings() {
   const [apiKey, setApiKey] = useState("");
   const [selectedModel, setSelectedModel] = useState("llama-3.3-70b-versatile");
   const [saved, setSaved] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleSave = () => {
     // Save to localStorage or your preferred storage
@@ -37,6 +40,14 @@ export function Settings() {
     localStorage.setItem("selected_model", selectedModel);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  };
+
+  const handleCopyApiKey = async () => {
+    if (apiKey) {
+      await navigator.clipboard.writeText(apiKey);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (
@@ -63,13 +74,42 @@ export function Settings() {
           <CardContent className="space-y-4">
             <Field>
               <FieldLabel>Groq API Key</FieldLabel>
-              <Input
-                type="password"
-                placeholder="gsk_..."
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                className="font-mono"
-              />
+              <div className="flex gap-2">
+                <Input
+                  type={showApiKey ? "text" : "password"}
+                  placeholder="gsk_..."
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  className="font-mono flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setShowApiKey(!showApiKey)}
+                  title={showApiKey ? "Hide API key" : "Show API key"}
+                >
+                  {showApiKey ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={handleCopyApiKey}
+                  disabled={!apiKey}
+                  title="Copy API key"
+                >
+                  {copied ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
               <FieldDescription>
                 Get your API key from{" "}
                 <a
