@@ -375,7 +375,8 @@ export default function ChatPage() {
           onSend={handleSendMessage}
           onFocus={() => {
             setIsInputFocused(true);
-            scrollToBottom();
+            // Delay scroll to allow keyboard to open on mobile
+            setTimeout(() => scrollToBottom(), 300);
           }}
           onBlur={() => setIsInputFocused(false)}
         />
