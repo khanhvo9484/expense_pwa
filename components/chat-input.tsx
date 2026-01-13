@@ -53,6 +53,13 @@ export function ChatInput({ onSend }: ChatInputProps) {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
   const handleCategorySelect = (category: (typeof quickCategories)[0]) => {
     setSelectedCategory(category);
   };
@@ -114,9 +121,10 @@ export function ChatInput({ onSend }: ChatInputProps) {
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyDown}
+          enterKeyHint="send"
           placeholder="Type a message..."
-          className="flex-1 px-4 py-2 bg-muted rounded-full text-sm outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-4 py-2 bg-muted rounded-full text-base outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={handleSend}
