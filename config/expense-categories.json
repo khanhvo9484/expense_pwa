@@ -1,0 +1,251 @@
+{
+  "categories": [
+    {
+      "id": "groceries",
+      "name": "Groceries",
+      "icon": "shopping-cart",
+      "color": "#FF6B6B",
+      "description": "Supermarket, fresh produce, household essentials"
+    },
+    {
+      "id": "dining-out",
+      "name": "Dining Out",
+      "icon": "utensils",
+      "color": "#E63946",
+      "description": "Restaurants, cafes, food delivery"
+    },
+    {
+      "id": "coffee-tea",
+      "name": "Coffee & Tea",
+      "icon": "coffee",
+      "color": "#A8DADC",
+      "description": "Coffee shops, tea houses, beverages"
+    },
+    {
+      "id": "public-transit",
+      "name": "Public Transit",
+      "icon": "bus",
+      "color": "#4ECDC4",
+      "description": "Bus, train, subway, metro fares"
+    },
+    {
+      "id": "taxi-rideshare",
+      "name": "Taxi & Ride Share",
+      "icon": "car",
+      "color": "#1D3557",
+      "description": "Uber, Lyft, Grab, taxi services"
+    },
+    {
+      "id": "fuel",
+      "name": "Fuel",
+      "icon": "fuel",
+      "color": "#457B9D",
+      "description": "Gasoline, diesel for personal vehicle"
+    },
+    {
+      "id": "parking",
+      "name": "Parking",
+      "icon": "square-parking",
+      "color": "#A8DADC",
+      "description": "Parking fees, garage, meters"
+    },
+    {
+      "id": "clothing",
+      "name": "Clothing",
+      "icon": "shirt",
+      "color": "#FFE66D",
+      "description": "Clothes, shoes, accessories"
+    },
+    {
+      "id": "electronics",
+      "name": "Electronics",
+      "icon": "smartphone",
+      "color": "#FCA311",
+      "description": "Gadgets, phones, computers, accessories"
+    },
+    {
+      "id": "home-furniture",
+      "name": "Home & Furniture",
+      "icon": "sofa",
+      "color": "#E9C46A",
+      "description": "Furniture, home decor, appliances"
+    },
+    {
+      "id": "movies-streaming",
+      "name": "Movies & Streaming",
+      "icon": "film",
+      "color": "#A8E6CF",
+      "description": "Cinema, Netflix, Disney+, streaming subscriptions"
+    },
+    {
+      "id": "gaming",
+      "name": "Gaming",
+      "icon": "gamepad-2",
+      "color": "#2A9D8F",
+      "description": "Video games, game subscriptions, in-game purchases"
+    },
+    {
+      "id": "gym-fitness",
+      "name": "Gym & Fitness",
+      "icon": "dumbbell",
+      "color": "#95E1D3",
+      "description": "Gym membership, fitness classes, sports"
+    },
+    {
+      "id": "electricity",
+      "name": "Electricity",
+      "icon": "zap",
+      "color": "#FFD93D",
+      "description": "Electric utility bills"
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "icon": "droplet",
+      "color": "#06B6D4",
+      "description": "Water utility bills"
+    },
+    {
+      "id": "internet",
+      "name": "Internet",
+      "icon": "wifi",
+      "color": "#8B5CF6",
+      "description": "Home internet, broadband"
+    },
+    {
+      "id": "mobile-phone",
+      "name": "Mobile Phone",
+      "icon": "phone",
+      "color": "#EC4899",
+      "description": "Phone bills, mobile plans"
+    },
+    {
+      "id": "rent",
+      "name": "Rent",
+      "icon": "home",
+      "color": "#FF8B94",
+      "description": "Monthly rent payment"
+    },
+    {
+      "id": "mortgage",
+      "name": "Mortgage",
+      "icon": "building",
+      "color": "#DC2626",
+      "description": "Home loan payment"
+    },
+    {
+      "id": "doctor-medical",
+      "name": "Doctor & Medical",
+      "icon": "stethoscope",
+      "color": "#EF4444",
+      "description": "Doctor visits, medical treatments"
+    },
+    {
+      "id": "pharmacy",
+      "name": "Pharmacy",
+      "icon": "pill",
+      "color": "#F59E0B",
+      "description": "Medications, prescriptions"
+    },
+    {
+      "id": "dental",
+      "name": "Dental",
+      "icon": "tooth",
+      "color": "#10B981",
+      "description": "Dentist visits, dental care"
+    },
+    {
+      "id": "insurance-health",
+      "name": "Health Insurance",
+      "icon": "shield-plus",
+      "color": "#3B82F6",
+      "description": "Health insurance premiums"
+    },
+    {
+      "id": "insurance-car",
+      "name": "Car Insurance",
+      "icon": "shield",
+      "color": "#6366F1",
+      "description": "Vehicle insurance"
+    },
+    {
+      "id": "books",
+      "name": "Books",
+      "icon": "book-open",
+      "color": "#B4A7D6",
+      "description": "Physical books, e-books, audiobooks"
+    },
+    {
+      "id": "online-courses",
+      "name": "Online Courses",
+      "icon": "graduation-cap",
+      "color": "#8B5CF6",
+      "description": "Udemy, Coursera, online learning"
+    },
+    {
+      "id": "tuition",
+      "name": "Tuition",
+      "icon": "school",
+      "color": "#6366F1",
+      "description": "School fees, college tuition"
+    },
+    {
+      "id": "flight",
+      "name": "Flight",
+      "icon": "plane",
+      "color": "#0EA5E9",
+      "description": "Airplane tickets"
+    },
+    {
+      "id": "hotel",
+      "name": "Hotel",
+      "icon": "bed",
+      "color": "#F97316",
+      "description": "Accommodation, lodging"
+    },
+    {
+      "id": "haircut-salon",
+      "name": "Haircut & Salon",
+      "icon": "scissors",
+      "color": "#FFA8A8",
+      "description": "Haircut, hair styling, salon services"
+    },
+    {
+      "id": "skincare-cosmetics",
+      "name": "Skincare & Cosmetics",
+      "icon": "sparkles",
+      "color": "#F472B6",
+      "description": "Makeup, skincare products"
+    },
+    {
+      "id": "laundry",
+      "name": "Laundry",
+      "icon": "washing-machine",
+      "color": "#A3E4D7",
+      "description": "Laundry service, dry cleaning"
+    },
+    {
+      "id": "pet-care",
+      "name": "Pet Care",
+      "icon": "paw-print",
+      "color": "#F4A460",
+      "description": "Pet food, vet, grooming"
+    },
+    {
+      "id": "gifts-donations",
+      "name": "Gifts & Donations",
+      "icon": "gift",
+      "color": "#DDA0DD",
+      "description": "Presents, charitable donations"
+    },
+    {
+      "id": "subscriptions",
+      "name": "Subscriptions",
+      "icon": "repeat",
+      "color": "#9B59B6",
+      "description": "Recurring monthly subscriptions"
+    }
+  ],
+  "defaultCurrency": "USD",
+  "budgetPeriods": ["daily", "weekly", "monthly", "yearly"]
+}
