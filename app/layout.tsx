@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   title: "My Expense - Track Your Spending",
   description: "Smart expense tracking with AI-powered chat interface",
   viewport:
-    "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
+    "width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -37,6 +38,24 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <Script id="disable-zoom" strategy="afterInteractive">
+          {`
+            document.addEventListener("gesturestart", function (e) {
+              e.preventDefault();
+              document.body.style.zoom = 0.99;
+            });
+
+            document.addEventListener("gesturechange", function (e) {
+              e.preventDefault();
+              document.body.style.zoom = 0.99;
+            });
+
+            document.addEventListener("gestureend", function (e) {
+              e.preventDefault();
+              document.body.style.zoom = 1;
+            });
+          `}
+        </Script>
       </body>
     </html>
   );
