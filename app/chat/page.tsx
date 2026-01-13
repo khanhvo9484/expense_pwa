@@ -35,6 +35,7 @@ export default function ChatPage() {
     categoryId?: string;
   } | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const viewportResizeHandlerRef = useRef<(() => void) | null>(null);
 
   const scrollToBottom = (smooth = true) => {
     if (chatContainerRef.current) {
@@ -42,6 +43,35 @@ export default function ChatPage() {
         top: chatContainerRef.current.scrollHeight,
         behavior: smooth ? "smooth" : "auto",
       });
+    }
+  };
+
+  const handleInputFocus = () => {
+    setIsInputFocused(true);
+    
+    // For first focus, listen to viewport resize to scroll after keyboard opens
+    if (typeof window !== 'undefined' && window.visualViewport) {
+      const handleResize = () => {
+        scrollToBottom();
+        // Remove listener after first resize
+        window.visualViewport?.removeEventListener('resize', handleResize);
+        viewportResizeHandlerRef.current = null;
+      };
+      
+      viewportResizeHandlerRef.current = handleResize;
+      window.visualViewport.addEventListener('resize', handleResize);
+    } else {
+      // Fallback for browsers without visualViewport API
+      setTimeout(() => scrollToBottom(), 300);
+    }
+  };
+
+  const handleInputBlur = () => {
+    setIsInputFocused(false);
+    // Clean up any pending resize listener
+    if (viewportResizeHandlerRef.current && window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', viewportResizeHandlerRef.current);
+      viewportResizeHandlerRef.current = null;
     }
   };
 
@@ -373,12 +403,8 @@ export default function ChatPage() {
       >
         <ChatInput
           onSend={handleSendMessage}
-          onFocus={() => {
-            setIsInputFocused(true);
-            // Delay scroll to allow keyboard to open on mobile
-            setTimeout(() => scrollToBottom(), 300);
-          }}
-          onBlur={() => setIsInputFocused(false)}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
         />
       </div>
 
