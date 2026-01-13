@@ -17,8 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Save, Key, Brain, Eye, EyeOff, Copy, Check } from "lucide-react";
+import { Save, Key, Brain, Eye, EyeOff, Copy, Check, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import packageJson from "@/package.json";
 
 const availableModels = [
   { id: "llama-3.3-70b-versatile", name: "Llama 3.3 70B Versatile" },
@@ -166,6 +167,24 @@ export function Settings() {
           <Save className="w-5 h-5" />
           {saved ? "Settings Saved!" : "Save Settings"}
         </button>
+
+        {/* App Version */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Info className="w-5 h-5 text-primary" />
+              <CardTitle>App Information</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Version</span>
+              <span className="text-sm font-mono font-semibold">
+                {packageJson.version}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

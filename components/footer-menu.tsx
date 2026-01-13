@@ -18,11 +18,20 @@ const menuItems = [
   { icon: Settings, label: "Settings", id: "settings", href: "/settings" },
 ];
 
-export function FooterMenu() {
+interface FooterMenuProps {
+  hidden?: boolean;
+}
+
+export function FooterMenu({ hidden = false }: FooterMenuProps) {
   const pathname = usePathname();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 safe-area-inset-bottom z-50">
+    <div
+      className={cn(
+        "fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 safe-area-inset-bottom z-50 transition-transform duration-300",
+        hidden && "translate-y-full"
+      )}
+    >
       <div className="flex items-center justify-around px-2 py-2 max-w-md mx-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;

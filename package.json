@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm version patch --no-git-tag-version",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

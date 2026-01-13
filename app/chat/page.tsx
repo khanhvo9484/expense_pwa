@@ -26,6 +26,7 @@ export default function ChatPage() {
     dayjs().format("YYYY-MM-DD")
   );
   const [showHistory, setShowHistory] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [pendingExpense, setPendingExpense] = useState<{
     amount: number;
@@ -365,12 +366,23 @@ export default function ChatPage() {
       )}
 
       {/* Chat Input - Fixed above footer */}
-      <div className="fixed bottom-[76px] left-0 right-0 max-w-md mx-auto bg-transparent">
-        <ChatInput onSend={handleSendMessage} onFocus={scrollToBottom} />
+      <div
+        className={`fixed left-0 right-0 max-w-md mx-auto bg-transparent transition-all duration-300 ${
+          isInputFocused ? "bottom-2" : "bottom-[76px]"
+        }`}
+      >
+        <ChatInput
+          onSend={handleSendMessage}
+          onFocus={() => {
+            setIsInputFocused(true);
+            scrollToBottom();
+          }}
+          onBlur={() => setIsInputFocused(false)}
+        />
       </div>
 
       {/* Footer Menu */}
-      <FooterMenu />
+      <FooterMenu hidden={isInputFocused} />
 
       {/* Chat History Modal */}
       {showHistory && (
