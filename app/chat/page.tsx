@@ -48,18 +48,18 @@ export default function ChatPage() {
 
   const handleInputFocus = () => {
     setIsInputFocused(true);
-    
+
     // For first focus, listen to viewport resize to scroll after keyboard opens
-    if (typeof window !== 'undefined' && window.visualViewport) {
+    if (typeof window !== "undefined" && window.visualViewport) {
       const handleResize = () => {
         scrollToBottom();
         // Remove listener after first resize
-        window.visualViewport?.removeEventListener('resize', handleResize);
+        window.visualViewport?.removeEventListener("resize", handleResize);
         viewportResizeHandlerRef.current = null;
       };
-      
+
       viewportResizeHandlerRef.current = handleResize;
-      window.visualViewport.addEventListener('resize', handleResize);
+      window.visualViewport.addEventListener("resize", handleResize);
     } else {
       // Fallback for browsers without visualViewport API
       setTimeout(() => scrollToBottom(), 300);
@@ -70,7 +70,10 @@ export default function ChatPage() {
     setIsInputFocused(false);
     // Clean up any pending resize listener
     if (viewportResizeHandlerRef.current && window.visualViewport) {
-      window.visualViewport.removeEventListener('resize', viewportResizeHandlerRef.current);
+      window.visualViewport.removeEventListener(
+        "resize",
+        viewportResizeHandlerRef.current
+      );
       viewportResizeHandlerRef.current = null;
     }
   };
