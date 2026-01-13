@@ -197,10 +197,7 @@ export default function StatsPage() {
             </CardContent>
           </Card>
         ) : categoryExpenses.length === 0 ? (
-          <Empty
-            title="No expenses yet"
-            description="Start tracking your expenses for this month"
-          />
+          <Empty title="No expenses yet" />
         ) : (
           <>
             {/* Total Card */}

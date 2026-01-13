@@ -104,7 +104,7 @@ export class ExpenseExtractor {
     }
 
     // Fuzzy matching with Vietnamese keywords
-    const vietnameseMapping: Record<string, string> = {
+    const vietnameseMapping: Record<string, string[]> = {
       groceries: ["chợ", "siêu thị", "rau", "thịt", "cá", "thực phẩm", "đồ ăn"],
       "dining-out": [
         "nhà hàng",
@@ -252,7 +252,7 @@ Output: {"amount": 30000, "categoryId": "groceries", "categoryName": "Groceries"
           confidence: "high",
         },
       };
-    } catch (error) {
+    } catch {
       return {
         success: false,
         error: "Failed to parse AI response",

@@ -99,7 +99,6 @@ export function ChatInput({ onSend }: ChatInputProps) {
               style={{
                 backgroundColor: isSelected ? category.color : category.bgLight,
                 color: isSelected ? "white" : category.color,
-                ringColor: isSelected ? category.color : undefined,
               }}
             >
               <Icon className="w-4 h-4" />

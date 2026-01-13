@@ -32,11 +32,8 @@ export default function ChatPage() {
     categoryId?: string;
   } | null>(null);
 
-  // Initialize database and reset to today's date on mount
+  // Initialize database on mount
   useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
-    setCurrentDate(today);
-
     db.init().catch((error) => {
       console.error("Failed to initialize database:", error);
     });
@@ -44,33 +41,32 @@ export default function ChatPage() {
 
   // Load chat messages for current date
   useEffect(() => {
-    loadChatMessages(currentDate);
-  }, [currentDate]);
-
-  const loadChatMessages = async (date: string) => {
-    try {
-      const chatMessages = await db.getChatMessagesByDate(date);
-      console.log("chatMsg", chatMessages);
-      if (chatMessages.length === 0) {
-        // Show welcome message for new day
-        setMessages([
-          {
-            id: "welcome",
-            text: "Hello! How can I help you today?",
-            isUser: false,
-            timestamp: new Date().toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-          },
-        ]);
-      } else {
-        setMessages(chatMessages);
+    const loadChatMessages = async () => {
+      try {
+        const chatMessages = await db.getChatMessagesByDate(currentDate);
+        if (chatMessages.length === 0) {
+          // Show welcome message for new day
+          setMessages([
+            {
+              id: "welcome",
+              text: "Hello! How can I help you today?",
+              isUser: false,
+              timestamp: new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
+            },
+          ]);
+        } else {
+          setMessages(chatMessages);
+        }
+      } catch (error) {
+        console.error("Failed to load chat messages:", error);
       }
-    } catch (error) {
-      console.error("Failed to load chat messages:", error);
-    }
-  };
+    };
+
+    loadChatMessages();
+  }, [currentDate]);
 
   const saveChatMessage = async (message: Message) => {
     try {
@@ -87,7 +83,7 @@ export default function ChatPage() {
 
   const handleSendMessage = async (text: string) => {
     const newMessage: Message = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       text,
       isUser: true,
       timestamp: new Date().toLocaleTimeString([], {
@@ -100,9 +96,9 @@ export default function ChatPage() {
     await saveChatMessage(newMessage);
 
     // Show typing indicator
-    const typingId = Date.now() + 1;
+    const typingId = crypto.randomUUID();
     const typingMessage: Message = {
-      id: typingId.toString(),
+      id: typingId,
       text: "Extracting expense...",
       isUser: false,
       timestamp: new Date().toLocaleTimeString([], {
@@ -116,7 +112,7 @@ export default function ChatPage() {
     const result = await ExpenseExtractor.extract(text);
 
     // Remove typing indicator
-    setMessages((prev) => prev.filter((msg) => msg.id !== typingId.toString()));
+    setMessages((prev) => prev.filter((msg) => msg.id !== typingId));
 
     if (result.success && result.data) {
       const {
@@ -138,7 +134,7 @@ export default function ChatPage() {
         });
 
         const responseMessage: Message = {
-          id: Date.now().toString(),
+          id: crypto.randomUUID(),
           text: `I found an expense of ${amount.toLocaleString(
             "vi-VN"
           )} VND. Please confirm the category below.`,
@@ -157,7 +153,7 @@ export default function ChatPage() {
       }
     } else {
       const errorMessage: Message = {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         text:
           result.error ||
           "Could not extract expense information. Please try again with format like: 'mua sách 20k' or 'Đi chợ 15k'",
@@ -190,7 +186,7 @@ export default function ChatPage() {
       });
 
       const successMessage: Message = {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         text: `Saved! ${amount.toLocaleString(
           "vi-VN"
         )} VND - ${categoryName}\n"${description}"`,
@@ -206,7 +202,7 @@ export default function ChatPage() {
       setPendingExpense(null);
     } catch (error) {
       const errorMessage: Message = {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         text: `Failed to save expense: ${
           error instanceof Error ? error.message : "Unknown error"
         }`,
@@ -237,7 +233,7 @@ export default function ChatPage() {
   const handleCategoryCancel = async () => {
     setPendingExpense(null);
     const cancelMessage: Message = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       text: "Expense cancelled. Feel free to try again!",
       isUser: false,
       timestamp: new Date().toLocaleTimeString([], {
