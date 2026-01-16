@@ -177,6 +177,18 @@ export class ExpenseExtractor {
 
   // Extract expense using AI
   static async extractWithAI(text: string): Promise<ExtractionResult> {
+    // Get today's date for the examples
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split("T")[0];
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split("T")[0];
+
     const systemPrompt = `You are an expense extraction assistant for Vietnamese users. Extract expense information from Vietnamese text including date references.
 
 Categories available: ${expenseCategories.categories
@@ -198,15 +210,17 @@ Rules:
   "date": "<YYYY-MM-DD>"
 }
 
+Current date is ${todayStr}. Use this to calculate relative dates.
+
 Examples:
 Input: "mua sách 20k"
-Output: {"amount": 20000, "categoryId": "books", "categoryName": "Books", "description": "mua sách", "date": "2026-01-11"}
+Output: {"amount": 20000, "categoryId": "books", "categoryName": "Books", "description": "mua sách", "date": "${todayStr}"}
 
 Input: "hôm qua đổ xăng 50k"
-Output: {"amount": 50000, "categoryId": "fuel", "categoryName": "Fuel", "description": "đổ xăng", "date": "2026-01-10"}
+Output: {"amount": 50000, "categoryId": "fuel", "categoryName": "Fuel", "description": "đổ xăng", "date": "${yesterdayStr}"}
 
 Input: "ngày mai đi chợ 30k"
-Output: {"amount": 30000, "categoryId": "groceries", "categoryName": "Groceries", "description": "đi chợ", "date": "2026-01-12"}`;
+Output: {"amount": 30000, "categoryId": "groceries", "categoryName": "Groceries", "description": "đi chợ", "date": "${tomorrowStr}"}`;
 
     const response = await AIService.sendMessage(text, systemPrompt);
 

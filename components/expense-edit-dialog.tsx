@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -36,7 +37,13 @@ interface ExpenseEditDialogProps {
   onOpenChange: (open: boolean) => void;
   onSave: (
     expenseId: string,
-    updates: { categoryId: string; categoryName: string; date: string }
+    updates: {
+      amount: number;
+      description: string;
+      categoryId: string;
+      categoryName: string;
+      date: string;
+    }
   ) => void;
   onDelete: (expenseId: string) => void;
 }
@@ -48,24 +55,34 @@ export function ExpenseEditDialog({
   onSave,
   onDelete,
 }: ExpenseEditDialogProps) {
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    new Date()
+  // Initialize state with expense values or defaults
+  const [selectedCategory, setSelectedCategory] = useState(
+    expense?.categoryId || ""
   );
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    expense ? parseISO(expense.date) : new Date()
+  );
+  const [amount, setAmount] = useState(expense?.amount.toString() || "");
+  const [description, setDescription] = useState(expense?.description || "");
 
-  if (!expense) return null;
-
-  // Initialize values when opening the dialog
+  // Reset form when dialog opens with new expense
   const handleOpenChange = (newOpen: boolean) => {
     if (newOpen && expense) {
       setSelectedCategory(expense.categoryId);
       setSelectedDate(parseISO(expense.date));
+      setAmount(expense.amount.toString());
+      setDescription(expense.description);
     }
     onOpenChange(newOpen);
   };
 
+  if (!expense) return null;
+
   const handleSave = () => {
-    if (!selectedCategory || !selectedDate) return;
+    if (!selectedCategory || !selectedDate || !amount || !description) return;
+
+    const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) return;
 
     const category = expenseCategories.categories.find(
       (c) => c.id === selectedCategory
@@ -73,6 +90,8 @@ export function ExpenseEditDialog({
     if (!category) return;
 
     onSave(expense.id, {
+      amount: parsedAmount,
+      description: description.trim(),
       categoryId: category.id,
       categoryName: category.name,
       date: format(selectedDate, "yyyy-MM-dd"),
@@ -98,16 +117,26 @@ export function ExpenseEditDialog({
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="amount">Amount</Label>
-            <div className="px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-semibold">
-              {expense.amount.toLocaleString("vi-VN")} VND
-            </div>
+            <Label htmlFor="amount">Amount (VND)</Label>
+            <Input
+              id="amount"
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="Enter amount"
+              min="0"
+              step="1000"
+            />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="description">Description</Label>
-            <div className="px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-md text-sm">
-              {expense.description}
-            </div>
+            <Input
+              id="description"
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter description"
+            />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="category">Category</Label>
@@ -176,7 +205,9 @@ export function ExpenseEditDialog({
           <Button
             type="button"
             onClick={handleSave}
-            disabled={!selectedCategory || !selectedDate}
+            disabled={
+              !selectedCategory || !selectedDate || !amount || !description
+            }
           >
             Save Changes
           </Button>

@@ -48,6 +48,8 @@ import {
   Filter,
   ArrowUpDown,
   Pencil,
+  List,
+  CalendarDays,
 } from "lucide-react";
 import { Empty } from "@/components/ui/empty";
 import {
@@ -73,6 +75,9 @@ export default function StatsPage() {
   const [sortBy, setSortBy] = useState<"date" | "amount">("date");
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"transactions" | "daily">(
+    "transactions"
+  );
 
   const getCategoryDetails = (categoryId: string) => {
     const category = categoriesData.categories.find(
@@ -208,7 +213,13 @@ export default function StatsPage() {
 
   const handleSaveExpense = async (
     expenseId: string,
-    updates: { categoryId: string; categoryName: string; date: string }
+    updates: {
+      amount: number;
+      description: string;
+      categoryId: string;
+      categoryName: string;
+      date: string;
+    }
   ) => {
     try {
       await db.updateExpense(expenseId, updates);
@@ -250,6 +261,25 @@ export default function StatsPage() {
   };
 
   const comparison = getComparison();
+
+  // Group expenses by date for daily view
+  const groupedByDate = sortedExpenses.reduce((acc, expense) => {
+    const date = expense.date;
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push(expense);
+    return acc;
+  }, {} as Record<string, Expense[]>);
+
+  const dailySummary = Object.entries(groupedByDate)
+    .map(([date, dayExpenses]) => ({
+      date,
+      expenses: dayExpenses,
+      total: dayExpenses.reduce((sum, exp) => sum + exp.amount, 0),
+      count: dayExpenses.length,
+    }))
+    .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime());
 
   return (
     <div className="flex flex-col h-screen max-w-md mx-auto bg-gray-50 dark:bg-black">
@@ -315,40 +345,62 @@ export default function StatsPage() {
       {/* Filter and Sort Controls */}
       {expenses.length > 0 && (
         <div className="px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex items-center gap-2">
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
-            >
-              <SelectTrigger className="flex-1">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  <SelectValue placeholder="All Categories" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categoriesData.categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-2 mb-3">
             <Button
-              variant={sortBy === "amount" ? "default" : "outline"}
+              variant={viewMode === "transactions" ? "default" : "outline"}
               size="sm"
-              onClick={() => setSortBy(sortBy === "date" ? "amount" : "date")}
-              className="gap-2"
+              onClick={() => setViewMode("transactions")}
+              className="flex-1 gap-2"
             >
-              <ArrowUpDown className="h-4 w-4" />
-              {sortBy === "date" ? "Date" : "Amount"}
+              <List className="h-4 w-4" />
+              Transactions
+            </Button>
+            <Button
+              variant={viewMode === "daily" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setViewMode("daily")}
+              className="flex-1 gap-2"
+            >
+              <CalendarDays className="h-4 w-4" />
+              Daily
             </Button>
           </div>
+          {viewMode === "transactions" && (
+            <div className="flex items-center gap-2">
+              <Select
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
+              >
+                <SelectTrigger className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4" />
+                    <SelectValue placeholder="All Categories" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categoriesData.categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                variant={sortBy === "amount" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSortBy(sortBy === "date" ? "amount" : "date")}
+                className="gap-2"
+              >
+                <ArrowUpDown className="h-4 w-4" />
+                {sortBy === "date" ? "Date" : "Amount"}
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Transactions List */}
+      {/* Transactions List or Daily Summary */}
       <div className="flex-1 overflow-y-auto pb-20">
         {loading ? (
           <div className="flex items-center justify-center py-8">
@@ -374,7 +426,77 @@ export default function StatsPage() {
               </EmptyHeader>
             </Empty>
           </div>
+        ) : viewMode === "daily" ? (
+          /* Daily Summary View */
+          <div className="px-4 py-4 space-y-3">
+            {dailySummary.map((day) => (
+              <Card
+                key={day.date}
+                className="p-4 bg-white dark:bg-gray-900 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <CalendarDays className="w-4 h-4 text-muted-foreground" />
+                    <p className="font-medium text-sm">
+                      {formatDate(day.date)}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-red-600 dark:text-red-400">
+                      {day.total.toLocaleString("vi-VN")}
+                    </p>
+                    <p className="text-xs text-muted-foreground">VND</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <List className="w-3.5 h-3.5" />
+                  <span>
+                    {day.count} transaction{day.count !== 1 ? "s" : ""}
+                  </span>
+                </div>
+                {/* Show category breakdown */}
+                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-800">
+                  <div className="flex flex-wrap gap-1.5">
+                    {Array.from(
+                      new Set(day.expenses.map((e) => e.categoryId))
+                    ).map((categoryId) => {
+                      const categoryExpenses = day.expenses.filter(
+                        (e) => e.categoryId === categoryId
+                      );
+                      const categoryTotal = categoryExpenses.reduce(
+                        (sum, e) => sum + e.amount,
+                        0
+                      );
+                      const categoryDetails = getCategoryDetails(categoryId);
+                      const IconComponent = categoryDetails
+                        ? getCategoryIcon(categoryDetails.icon)
+                        : null;
+                      const color = categoryDetails?.color || "#3B82F6";
+
+                      return (
+                        <span
+                          key={categoryId}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full"
+                          style={{
+                            backgroundColor: `${color}20`,
+                            color: color,
+                          }}
+                        >
+                          {IconComponent && (
+                            <IconComponent className="w-3 h-3" />
+                          )}
+                          {categoryDetails?.name}:{" "}
+                          {formatCompactAmount(categoryTotal)}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
         ) : (
+          /* Transactions View */
           <div className="px-4 py-4">
             <Accordion type="single" collapsible className="space-y-2">
               {currentExpenses.map((expense) => {
